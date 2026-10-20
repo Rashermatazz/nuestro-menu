@@ -241,6 +241,36 @@ a.btn{text-decoration:none;color:var(--fg)}
 .tlc .ml:first-child{border-top:none}
 .tlc .swapbtn{margin:6px 0 10px}
 .tlc .opts{padding:8px 0 10px}
+.pst{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding:8px 0 10px;line-height:1.4}
+.pst b{color:var(--fg);font-weight:600}
+.brep{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.brep:first-child{border-top:none}
+.brep-i{font-size:18px;width:24px;text-align:center}
+.brep b{display:block;font-size:14px}
+.brep small{display:block;font-size:12.5px;color:var(--muted)}
+.bday{flex:none;font-size:11px;font-weight:600;background:var(--soft);border-radius:8px;padding:3px 7px;white-space:nowrap}
+.wday{background:var(--card);border-radius:18px;padding:10px 14px 6px;margin-bottom:12px;scroll-margin-top:12px}
+.wday.today{box-shadow:0 0 0 2px var(--accent)}
+.wdh{display:flex;align-items:center;gap:8px;padding:2px 0 6px;border-bottom:1px solid var(--line)}
+.wdh b{font-size:16px}
+.hoy{font-size:11px;font-weight:600;background:var(--accent);border-radius:99px;padding:2px 9px}
+.wk-k{margin-left:auto;font-size:11px;color:var(--muted)}
+.wnote{font-size:12px;color:var(--muted);margin:6px 0 0}
+.wr{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-top:1px solid var(--soft)}
+.wdh+.wr,.wnote+.wr{border-top:none}
+.wr-e{width:22px;text-align:center;font-size:16px;padding-top:9px}
+.wr-b{flex:1;min-width:0;display:flex;flex-direction:column}
+.wr-n{border:none;background:transparent;text-align:left;font:inherit;color:var(--fg);font-size:14.5px;font-weight:500;line-height:1.35;padding:8px 0 2px;cursor:pointer;min-height:36px}
+.wr-n:disabled{cursor:default}
+.wr-n+.wr-n{padding-top:0;min-height:28px}
+.wr-w{font-size:12px;font-weight:600;color:var(--muted);margin-right:2px}
+.wr-ps{font-size:12px;color:var(--muted);padding:0 0 4px}
+.wr-sw{flex:none;width:36px;height:36px;margin-top:4px;border:1px solid var(--line);border-radius:10px;background:var(--soft);font-size:15px;cursor:pointer;color:var(--fg)}
+.wr-sw.on{background:var(--com);border-color:transparent}
+.wr-x{margin:0 0 10px 32px}
+.wr-t{font-size:10.5px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);padding-top:8px}
+.wr-t+.wr-n{padding-top:1px}
+.wr-e{padding-top:6px !important}
 .hsect{display:flex;align-items:center;gap:8px}
 .hdot{width:10px;height:10px;border-radius:50%}
 .w-M{background:var(--cen) !important;color:var(--ink-cen)} .w-N{background:var(--mer) !important;color:var(--ink-mer)} .hdot.w-both,.whochip.w-both{background:var(--soft)}
@@ -397,7 +427,7 @@ function ph(id, tint, size){
   return '<span class="ph t-' + tint + '"' + (size ? ' style="height:' + size + 'px"' : '') + '>' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy">' : IC.bowl) + '</span>';
 }
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 2600); }
-function go(view, extra){ Object.assign(S, extra || {}); if (view !== 'receta') S.cook = false; S.view = view; S.confirm = null; render(); window.scrollTo(0, 0); }
+function go(view, extra){ Object.assign(S, extra || {}); if (view !== 'receta') S.cook = false; S.view = view; S.confirm = null; render(); window.scrollTo(0, 0); if (view === 'menu') { const w = weekInfo(); const el = S.week === w.week && document.getElementById('dia-' + w.todayIdx); if (el && w.todayIdx > 0) el.scrollIntoView({block: 'start'}); } }
 
 /* ---------- vistas ---------- */
 function vInicio(){
@@ -408,8 +438,8 @@ function vInicio(){
   return '<div class="hero"><span class="logo">' + IC.menu.replace('stroke-width="2"', 'stroke-width="2" stroke="currentColor"') + '</span><h1>Nuestro Menú</h1><span class="muted">' + esc(fmtDate(new Date())) + '</span><button class="wk" data-week="' + other + '" style="margin-top:8px;font-weight:400"><b>Semana ' + wk + '</b> <span class="muted">· Cambiar a ' + other + '</span></button></div>'
     + '<div class="card today"><h2>' + (wk === w.week ? 'Hoy, ' : 'Semana ' + wk + ', ') + esc(day.d.toLowerCase()) + '</h2>' + rows + '</div>'
     + navCard('menu', IC.cal, 'Menú semanal', 'Qué comemos cada día y cuánto', true)
-    + navCard('recetas', IC.grid.replace('stroke-width="2"', 'stroke="currentColor" stroke-width="2"'), 'Alternativas', DATA.alts.length + ' platos para cambiar algún día', 'rec')
-    + navCard('lista', IC.cart.replace('stroke-width="2"', 'stroke="currentColor" stroke-width="2"'), 'Lista de la compra', 'Semana ' + wk + ' · ' + total.done + ' de ' + total.all + ' comprados', 'shop');
+    + navCard('alimentos', '<span style="font-size:22px;width:24px;text-align:center">🥦</span>', 'Alimentos para Natalia', 'Qué le sienta bien, con ración y mejor evitar', 'rec')
+    + navCard('batch', '<span style="font-size:22px;width:24px;text-align:center">🍲</span>', 'Batch cooking', 'Quién hace qué el domingo y para qué días', 'shop');
 }
 function navCard(view, icon, t, sub, hi){
   return '<button class="card nav-card' + (hi === true ? ' hi' : hi ? ' ' + hi : '') + '" data-go="' + view + '">' + icon + '<span class="t"><b>' + esc(t) + '</b><span>' + esc(sub) + '</span></span><span aria-hidden="true">›</span></button>';
@@ -421,40 +451,53 @@ function swapAt(wk, day, mi){ const id = S.swaps[wk][day + '-' + mi]; if (!id) r
 function kn(s){ return parseInt(String(s).replace(/\./g, ''), 10) || 0; }
 function fmtK(n){ return n.toLocaleString('es-ES'); }
 function vMenu(){
-  const w = weekInfo(); const wk = S.week;
-  const days = DATA.weeks[wk];
-  const chips = days.map((d, i) => { const dt = dateFor(wk, i); const today = wk === w.week && i === w.todayIdx;
-    return '<button class="chip' + (i === S.day ? ' on' : '') + (today ? ' is-today' : '') + '" data-day="' + i + '" aria-label="' + esc(d.d + ' ' + dt.getDate()) + '"><span>' + esc(d.d.slice(0,3)) + '</span><b>' + dt.getDate() + '</b></button>'; }).join('');
-  const day = days[S.day];
-  const seg = ['both','M','N'].map((k) => '<button class="' + (S.who === k ? 'on' : '') + '" data-who="' + k + '">' + ({both:'Los dos', M:'Mario', N:'Natalia'}[k]) + '</button>').join('');
-  const other = wk === 'A' ? 'B' : 'A';
+  const w = weekInfo(); const wk = S.week; const days = DATA.weeks[wk]; const other = wk === 'A' ? 'B' : 'A';
   let h = '<div class="top"><h1>Menú semanal</h1></div>'
-    + '<div class="weekbar"><b style="flex:1">Semana ' + wk + (wk === w.week ? ' · esta semana' : ' · la que viene') + '</b><button class="wk" data-week="' + other + '">Ver semana ' + other + '</button></div>'
-    + '<div class="card days">' + chips + '</div>';
-  if (S.day === 1) h += '<div class="note">Mario, martes en casa de tus padres: la comida del táper es tu cena y te saltas la cena del menú.</div>';
-  let dM = 0, dN = 0;
-  h += '<div class="tl">' + day.m.map((m, mi) => { const sw = swapAt(wk, S.day, mi); if (sw) { dM += sw.kM - sw.oM; dN += sw.kN - sw.oN; } return mealCard(m, mi, sw); }).join('') + '</div>';
-  const kM = '<div class="card"><b>Mario</b><br>' + fmtK(kn(day.kM) + dM) + ' kcal' + (day.free ? ' sin la comida' : '') + '</div>';
-  const kN = '<div class="card"><b>Natalia</b><br>' + fmtK(kn(day.kN) + dN) + ' kcal' + (day.free ? ' sin la comida' : '') + '</div>';
-  h += '<div class="kc">' + kM + kN + '</div>';
+    + '<div class="weekbar"><b style="flex:1">Semana ' + wk + (wk === w.week ? ' · esta semana' : ' · la que viene') + '</b><button class="wk" data-week="' + other + '">Ver semana ' + other + '</button></div>';
+  days.forEach((day, di) => {
+    const dt = dateFor(wk, di); const today = wk === w.week && di === w.todayIdx;
+    let dM = 0, dN = 0;
+    const rows = day.m.map((m, mi) => { const sw = swapAt(wk, di, mi); if (sw) { dM += sw.kM - sw.oM; dN += sw.kN - sw.oN; } return weekRow(m, di, mi, sw); }).join('');
+    h += '<section class="wday' + (today ? ' today' : '') + '" id="dia-' + di + '"><div class="wdh"><b>' + esc(day.d) + ' ' + dt.getDate() + '</b>' + (today ? '<span class="hoy">hoy</span>' : '') + '<span class="wk-k">M ' + fmtK(kn(day.kM) + dM) + ' | N ' + fmtK(kn(day.kN) + dN) + ' kcal' + (day.free ? ' + comida libre' : '') + '</span></div>'
+      + (di === 1 ? '<p class="wnote">Mario: la comida del táper es tu cena (martes en casa de tus padres).</p>' : '')
+      + rows + '</section>';
+  });
   return h;
 }
 const MER = {M: ['1 Activia + 1 mandarina', '30 g pan integral con tomate y 20 g de jamón Duroc', '30 g pan integral con 10 g de chocolate', '1 plátano pequeño + 50 g frutos rojos'],
   N: ['Porridge: 30 g de avena cocida en 120 ml de bebida de avena, ½ plátano y 15 g de nueces', '35 g pan de arroz con aguacate y tomate', '35 g pan de arroz con 20 g de queso de cabra', '1 kiwi + 1 mandarina + 10 g de chocolate'],
   extra: ''};
+function weekRow(m, di, mi, sw){
+  const key = di + '-' + mi; const E = {Desayuno: '☀️', Comida: '🍽️', Merienda: '🍎', Cena: '🌙'};
+  const btn = (rid, txt, who) => '<button class="wr-n' + (who === 'Natalia' ? ' wr-n2' : '') + '"' + (rid ? ' data-rec="' + rid + '"' + (sw ? ' data-ctx="' + key + '"' : '') : ' disabled') + '>' + (who ? '<span class="wr-w">' + who + ':</span> ' + esc(cap(String(txt).replace(/^M: /, '').split(/ (?:·|\/) N: /)[who === 'Natalia' && /^M: /.test(txt) ? 1 : 0] || txt)) : nl(txt)) + '</button>';
+  let main;
+  if (m.t === 'Merienda') main = '<button class="wr-n" data-meropen="' + key + '"><span class="wr-w">Mario:</span> Activia + mandarina <span class="muted">' + (S.merOpen === key ? '▴' : '▾') + '</span></button><button class="wr-n wr-n2" data-meropen="' + key + '"><span class="wr-w">Natalia:</span> Porridge con nueces</button>';
+  else if (sw) main = btn(sw.id, sw.t);
+  else if (m.t === 'Desayuno' || /^M: /.test(m.p) || (m.rN || m.r) !== m.r || (m.pN && m.pN !== m.p)) main = btn(m.r, m.p, 'Mario') + btn(m.rN || m.r, m.pN || m.p, 'Natalia');
+  else main = btn(m.r, m.p);
+  const ps = m.ps || {}; const pst = (ps.M || ps.N) ? '<span class="wr-ps">🥄 ' + (ps.M === ps.N ? esc(ps.M) : 'M: ' + esc(ps.M || 'sin postre') + ' | N: ' + esc(ps.N || 'sin postre')) + '</span>' : '';
+  const opts = subsFor(m);
+  const sbtn = sw ? '<button class="wr-sw on" data-unswap="' + key + '" aria-label="Volver al plato original">↺</button>' : (opts.length ? '<button class="wr-sw" data-swapopen="' + key + '" aria-label="Cambiar plato">⇄</button>' : '');
+  let extra = '';
+  if (m.t === 'Merienda' && S.merOpen === key) extra = '<div class="opts wr-x">' + [['Mario', MER.M], ['Natalia', MER.N]].map(([w2, l]) => '<div class="opt"><b>' + w2 + '</b>' + l.map((x) => '<span class="cmp">· ' + esc(x) + '</span>').join('') + '</div>').join('') + '</div>';
+  if (!sw && S.swapOpen === key && opts.length) extra = '<div class="opts wr-x"><p class="muted" style="margin:0;font-size:12.5px">Cambiar por (mismas kcal y proteína del día):</p>'
+    + opts.map((o) => '<div class="opt"><b>' + esc(o.t) + '</b><div class="row2"><button class="btn primary sm" data-swap="' + key + '|' + o.id + '">Elegir este</button><button class="btn sm" data-rec="' + o.id + '" data-ctxid="' + key + '|' + o.id + '">Ver receta</button></div></div>').join('') + '</div>';
+  return '<div class="wr"><span class="wr-e" aria-hidden="true">' + E[m.t] + '</span><div class="wr-b"><span class="wr-t">' + esc(m.t) + '</span>' + main + pst + '</div>' + sbtn + '</div>' + extra;
+}
 function mealCard(m, mi, sw){
   const tint = TINT[m.t];
   const key = S.day + '-' + mi;
   const line = (rid, name, tag) => '<button class="ml"' + (rid ? ' data-rec="' + rid + '"' + (sw ? ' data-ctx="' + key + '"' : '') : ' disabled') + '>' + (tag ? '<span class="mtag">' + tag + '</span>' : '') + '<span class="mname">' + esc(name.charAt(0).toUpperCase() + name.slice(1)) + '</span>' + (rid ? '<span class="chev" aria-hidden="true">›</span>' : '') + '</button>';
   let body;
-  if (m.t === 'Merienda') body = S.merOpen === key ? '<div class="opts">' + [['Mario', MER.M], ['Natalia', MER.N]].map(([w, l]) => '<div class="opt"><b>' + w + '</b>' + l.map((x) => '<span class="cmp">· ' + esc(x) + '</span>').join('') + '</div>').join('') + (MER.extra ? '<p class="muted" style="margin:0;font-size:12.5px">' + esc(MER.extra) + '</p>' : '') + '</div>' : '';
-  else if (m.t === 'Desayuno' && !sw) body = line(m.r, m.p);
+  if (m.t === 'Merienda') body = true ? '<div class="opts">' + [['Mario', MER.M], ['Natalia', MER.N]].map(([w, l]) => '<div class="opt"><b>' + w + '</b>' + l.map((x) => '<span class="cmp">· ' + esc(x) + '</span>').join('') + '</div>').join('') + (MER.extra ? '<p class="muted" style="margin:0;font-size:12.5px">' + esc(MER.extra) + '</p>' : '') + '</div>' : '';
   else if (sw) body = line(sw.id, sw.t);
   else {
     const rM = m.r, rN = m.rN || m.r, pM = m.p, pN = m.pN || m.p;
     if (rM === rN && pM === pN) body = /^M: /.test(pM) ? line(rM, pM.split(/ (?:·|\/) N: /)[0].replace(/^M: /, ''), 'Mario') + line(rM, (pM.split(/ (?:·|\/) N: /)[1] || ''), 'Natalia') : line(rM, pM);
     else body = line(rM, pM, 'Mario') + line(rN, pN, 'Natalia');
   }
+  const ps = m.ps || {}; const pM = ps.M || '', pN = ps.N || '';
+  const pst = (pM || pN) ? '<div class="pst"><span class="pst-i" aria-hidden="true">🥄</span><span><b>Postre</b> · ' + (pM === pN ? esc(cap(pM)) + ' los dos' : 'Mario: ' + esc(pM || 'sin postre') + ' · Natalia: ' + esc(pN || 'sin postre')) + '</span></div>' : '';
   const opts = subsFor(m);
   let foot = '';
   if (sw) foot = '<div class="swapbar"><span class="pill t-com">Plato cambiado</span><button class="btn sm" data-unswap="' + key + '">Volver al original</button></div>';
@@ -463,8 +506,8 @@ function mealCard(m, mi, sw){
     if (S.swapOpen === key) foot += '<div class="opts"><p class="muted" style="margin:0;font-size:12.5px">Solo platos del mismo tipo (' + esc(groupOf(opts[0].id)) + ') y con las raciones ajustadas para que las kcal y la proteína del día no cambien.</p>'
       + opts.map((o) => '<div class="opt"><b>' + esc(o.t) + '</b><div class="row2"><button class="btn primary sm" data-swap="' + key + '|' + o.id + '">Elegir este</button><button class="btn sm" data-rec="' + o.id + '" data-ctxid="' + key + '|' + o.id + '">Ver receta</button></div></div>').join('') + '</div>';
   }
-  return '<section class="tli"><span class="tdot td-' + tint + '" aria-hidden="true"></span><div class="meal-h"><h2>' + emo(m.t) + esc(m.t) + '</h2>' + (m.t === 'Merienda' ? '<button class="pill t-mer pillbtn" data-meropen="' + key + '" aria-expanded="' + (S.merOpen === key) + '">' + (S.merOpen === key ? 'ocultar opciones ▴' : 'ver opciones ▾') + '</button>' : (m.p === 'Libre, fuera de casa' ? '<span class="pill t-' + tint + '">libre</span>' : '')) + '</div>'
-    + (body || foot ? '<div class="card tlc">' + body + foot + '</div>' : '') + '</section>';
+  return '<section class="tli"><span class="tdot td-' + tint + '" aria-hidden="true"></span><div class="meal-h"><h2>' + emo(m.t) + esc(m.t) + '</h2>' + (m.t === 'Merienda' ? '<span class="pill t-mer">elige una</span>' : (m.p === 'Libre, fuera de casa' ? '<span class="pill t-' + tint + '">libre</span>' : '')) + '</div>'
+    + (body || foot ? '<div class="card tlc">' + body + pst + foot + '</div>' : '') + '</section>';
 }
 function groupOf(altId){ const a = DATA.alts.find((x) => x.id === altId); return a ? a.grupo.toLowerCase() : ''; }
 
@@ -620,44 +663,59 @@ function vLista(){
 function vMas(){
   const card = (view, cls, t, sub) => '<button class="card nav-card ' + cls + '" data-go="' + view + '"><span class="t"><b>' + esc(t) + '</b><span>' + esc(sub) + '</span></span><span aria-hidden="true">›</span></button>';
   return '<div class="top"><h1>Más</h1></div>'
-    + card('alimentos', 'shop', '🥦 Alimentos para Natalia', 'Qué le sienta bien, con ración y mejor evitar')
     + card('batch', 'hi', '🍲 Batch del domingo', 'Quién hace qué y en qué orden')
-    + card('hogar', 'rec', '🏠 Hogar', 'Batch cooking, limpieza y tareas de los dos')
+    + card('hogar', 'rec', '🏠 Hogar', 'Limpieza y tareas de casa, por semanas')
     + card('restaurantes', 'hi', '🍴 Restaurantes', 'Vuestros sitios favoritos para comer fuera')
     + card('notas', '', '📝 Notas y ajustes', 'Postres, entreno, meriendas y cómo instalarla');
 }
 function backTo(view, label){ return '<div class="top"><button class="ib" data-go="' + view + '" aria-label="Volver">' + IC.back + '</button><h1>' + esc(label) + '</h1></div>'; }
 const BATCH = {
-  A: {t: 'Domingo antes de la semana A', dishes: 'Pollo con arroz (lunes) · Guiso de sepia (martes) · Lentejas (miércoles y jueves)', steps: [
-    ['both', 'Sacad todo a la encimera y dejad dos cazuelas, una sartén grande y un cazo a mano.'],
-    ['M', 'Cazo: el ARROZ integral a cocer. Va solo, no hay que estar encima.'],
-    ['N', 'Pica TODA la verdura de una vez y sepárala en boles: zanahoria, pimiento, cebolla, calabacín y berenjena.'],
-    ['M', 'Cazuela 1, el GUISO DE SEPIA: marca la sepia, sofrito y caldo. Tapa y a fuego suave.'],
-    ['N', 'Cazuela 2, las LENTEJAS: dora el contramuslo, sofrito, agua y la patata. Tapa y a fuego suave.'],
-    ['M', 'Con las dos cazuelas en marcha, sartén: verduras del pollo y luego el POLLO.'],
-    ['N', 'Pela y chasca la patata del guiso y échala cuando la sepia lleve unos 20 min.'],
-    ['N', 'Lentejas de bote enjuagadas al final, 10 min sin tapa.'],
-    ['M', 'Escurre el arroz y cuece los huevos del guiso.'],
-    ['both', 'Mientras templa, uno friega y el otro reparte en tápers con el día puesto.']],
-    tips: ['Cuatro fuegos: las dos cazuelas en los grandes, el arroz en el pequeño y la sartén donde quede.', 'Las lentejas del jueves, al congelador: el jueves ya son 4 días.']},
-  B: {t: 'Domingo antes de la semana B', dishes: 'Estofado de pollo (lunes y miércoles) · Garbanzos con pollo (jueves)', steps: [
-    ['both', 'Sacad todo a la encimera y dejad dos cazuelas y un cazo a mano.'],
-    ['M', 'Cazo: el ARROZ integral del lunes a cocer.'],
-    ['N', 'Pica la verdura (zanahoria y pimiento) y pela la patata de los dos platos; la patata, en un bol con agua.'],
-    ['M', 'Cazuela 1, el ESTOFADO: dora el contramuslo, sofrito, patata y agua hasta cubrir. Tapa y a fuego suave.'],
-    ['N', 'Cazuela 2, los GARBANZOS: dora la pechuga, sofrito, patata y agua. Tapa.'],
-    ['N', 'Al final, los garbanzos enjuagados y el pollo de vuelta, unos minutos más.'],
-    ['M', 'Escurre el arroz.'],
-    ['both', 'Uno friega y el otro reparte en tápers: lunes, miércoles y jueves.']],
-    tips: ['La ración de garbanzos del jueves, al congelador; el estofado del miércoles aguanta en la nevera.']}
+  A: {t: 'Domingo antes de la semana A', dishes: 'Cocináis: pollo con verduras (lun), guiso de sepia (mar) y lentejas (mié y jue). Dejáis preparado: arroz, patata y calabacín. Cantidades para los dos.',
+    rep: [
+      ['🧅', 'Sofrito común: 340 g zanahoria · 280 g pimiento rojo · 440 g tomate triturado', '⅓ al guiso de sepia (mar) | ⅔ a las lentejas (mié y jue). La cebolla (70 g) solo va al guiso.'],
+      ['🍚', 'Arroz integral: 260 g en seco', '130 g para el pollo (lun) | 130 g para el wok (vie, congelado)'],
+      ['🥔', 'Patata de las cenas: 830 g pelada', '400 g salmón (lun) | 430 g merluza (mié)'],
+      ['🥒', 'Calabacín: 840 g', '140 g pollo (lun, se cocina hoy) | 300 g tortilla (mar) | 400 g merluza (mié)'],
+      ['🥕', 'Zanahoria de la semana: 560 g', '340 g sofrito | 100 g pollo (lun) | 120 g wok (vie)']],
+    steps: [
+      ['N', 'Pica toda la ZANAHORIA (560 g) y el PIMIENTO rojo (380 g). Separa en boles: sofrito (340 g zanahoria + 280 g pimiento), pollo del lunes (100 g + 100 g) y wok del viernes (120 g zanahoria, a la nevera). Pica también 70 g de cebolla y 100 g de berenjena.', 'todo'],
+      ['M', 'Cazo grande: 260 g de ARROZ integral en seco (lunes y viernes).', 'lun · vie'],
+      ['M', 'Sartén grande: el SOFRITO común con 340 g de zanahoria, 280 g de pimiento y, al final, 440 g de tomate triturado. Reparte: ⅓ a la cazuela del guiso y ⅔ a la de las lentejas.', 'mar · mié · jue'],
+      ['N', 'Cazuela 1, GUISO: pocha 70 g de cebolla, marca 270 g de sepia, su ⅓ de sofrito y 600-700 ml de caldo. Tapa; a los 20 min, 390 g de patata chascada.', 'mar'],
+      ['M', 'Cazuela 2, LENTEJAS: dora 330 g de contramuslo, su ⅔ de sofrito, 600 ml de agua y 300 g de patata. Tapa; al final, 500 g de lentejas escurridas (2 botes).', 'mié · jue'],
+      ['N', 'PATATA de las cenas: 830 g pelada en dados, tapada al microondas hasta que se pinche. 400 g al táper del lunes y 430 g al del miércoles.', 'lun · mié'],
+      ['M', 'Sartén (la del sofrito, sin lavar): verduras del pollo (100 g zanahoria, 100 g pimiento, 100 g berenjena, 140 g calabacín) y 390 g de PECHUGA.', 'lun'],
+      ['N', 'CALABACÍN: 300 g en dados para la tortilla del martes y 400 g en rodajas para la merluza del miércoles. En tápers con papel de cocina.', 'mar · mié'],
+      ['both', 'Arroz escurrido: la mitad al táper del lunes y la otra mitad al congelador (viernes). Cuece 3 huevos para el guiso.', 'lun · vie'],
+      ['both', 'Uno friega y el otro reparte. Pon en cada táper el día.', '']],
+    tips: ['Las lentejas del jueves, al congelador: el jueves ya son 4 días.', 'El arroz cocido, a la nevera en cuanto temple; el que no sea para mañana, mejor congelado.', 'El calabacín de la pasta del viernes (500 g) se corta ese día: cortado no aguanta tanto.']},
+  B: {t: 'Domingo antes de la semana B', dishes: 'Cocináis: estofado de pollo (lun y mié), pisto (mar) y garbanzos (jue). Dejáis preparado: arroz y patata. Cantidades para los dos.',
+    rep: [
+      ['🧅', 'Sofrito común: 520 g zanahoria · 200 g pimiento rojo · 360 g tomate triturado', '70 % al estofado (lun y mié) | 30 % a los garbanzos (jue). El pimiento va todo al estofado.'],
+      ['🍚', 'Arroz integral: 215 g en seco', '100 g estofado (lun) | 115 g pisto (mar)'],
+      ['🫑', 'Pisto: 300 g calabacín · 160 g pimiento · 160 g berenjena · 200 g tomate', 'todo para el martes'],
+      ['🥔', 'Patata: 800 g para las ollas + 860 g para las cenas', 'ollas: 530 g estofado | 270 g garbanzos · cenas: 430 g dorada (mié) | 430 g sepia (jue)'],
+      ['🥒', 'Calabacín: 700 g', '300 g pisto (mar) | 400 g dorada (mié)']],
+    steps: [
+      ['N', 'Pica 520 g de ZANAHORIA y 360 g de PIMIENTO rojo (200 g sofrito + 160 g pisto), 160 g de berenjena y 300 g de calabacín para el pisto. Pela 800 g de PATATA para las ollas, en agua.', 'todo'],
+      ['M', 'Cazo: 215 g de ARROZ integral en seco (lunes y martes).', 'lun · mar'],
+      ['M', 'Sartén grande: SOFRITO común con 520 g de zanahoria, 200 g de pimiento y 360 g de tomate. Reparte: 70 % al estofado y 30 % a los garbanzos.', 'lun · mié · jue'],
+      ['M', 'Cazuela 1, ESTOFADO: dora 660 g de contramuslo, su parte de sofrito, 530 g de patata y agua hasta cubrir. Tapa y a fuego suave.', 'lun · mié'],
+      ['N', 'Cazuela 2, GARBANZOS: dora 300 g de pechuga, su parte de sofrito, 270 g de patata y agua. Tapa; al final, 190 g de garbanzos escurridos.', 'jue'],
+      ['N', 'Sartén: el PISTO con 300 g de calabacín, 160 g de pimiento, 160 g de berenjena y 200 g de tomate triturado, hasta que esté blando.', 'mar'],
+      ['M', 'PATATA de las cenas: 860 g en dados al microondas tapada. 430 g al táper del miércoles y 430 g al del jueves.', 'mié · jue'],
+      ['N', 'Corta 400 g de calabacín en rodajas para la dorada del miércoles.', 'mié'],
+      ['both', 'Arroz: 100 g en seco (la mitad) al táper del lunes y el resto al congelador para el martes. Uno friega y el otro reparte en tápers con el día.', 'lun · mar']],
+    tips: ['Los garbanzos del jueves, al congelador; el estofado del miércoles aguanta en la nevera.', 'El arroz del martes, saca del congelador la noche antes.', 'El salmón y el boniato del lunes, y el arroz con gambas del viernes, se hacen en el momento.']}
 };
 function vBatch(){
   const cur = weekInfo().week; const nxt = cur === 'A' ? 'B' : 'A'; if (!S.bwk) S.bwk = nxt; const b = BATCH[S.bwk];
   let h = backTo('mas', 'Batch del domingo')
     + '<div class="seg" role="group" aria-label="Semana">' + ['A','B'].map((x) => '<button class="' + (S.bwk === x ? 'on' : '') + '" data-bwk="' + x + '">Para la semana ' + x + '</button>').join('') + '</div>'
     + '<div class="card" style="padding:12px 14px;margin-bottom:12px"><b>' + esc(b.t) + '</b><p class="muted" style="margin:4px 0 0;font-size:13px">' + esc(b.dishes) + '</p></div>'
-    + '<p class="muted" style="font-size:12.5px;margin:0 0 10px">En orden: cada uno sigue sus pasos y así no os pisáis. Las cantidades y el detalle están en cada receta del menú.</p>'
-    + '<ol class="card bsteps">' + b.steps.map((x) => '<li><span class="whochip w-' + x[0] + '">' + esc(WHO[x[0]]) + '</span><span>' + esc(x[1]) + '</span></li>').join('') + '</ol>'
+    + '<div class="sect" style="margin-top:4px">🔁 Lo que se repite esta semana</div><div class="card" style="padding:4px 14px;margin-bottom:12px">' + b.rep.map((x) => '<div class="brep"><span class="brep-i">' + x[0] + '</span><span><b>' + esc(x[1]) + '</b><small>' + esc(x[2]) + '</small></span></div>').join('') + '</div>'
+    + '<div class="sect">👣 Paso a paso</div><p class="muted" style="font-size:12.5px;margin:0 0 10px">Cada uno sigue sus pasos en orden. A la derecha, para qué días es. Cantidades y detalle, en cada receta del menú.</p>'
+    + '<ol class="card bsteps">' + b.steps.map((x) => '<li><span class="whochip w-' + x[0] + '">' + esc(WHO[x[0]]) + '</span><span style="flex:1">' + esc(x[1]) + '</span>' + (x[2] ? '<span class="bday">' + esc(x[2]) + '</span>' : '') + '</li>').join('') + '</ol>'
     + '<div class="card" style="padding:12px 14px;margin-top:12px;font-size:13.5px"><b>Trucos</b><ul style="margin:6px 0 0;padding-left:18px">' + b.tips.map((t) => '<li>' + esc(t) + '</li>').join('') + '</ul></div>';
   return h;
 }
@@ -674,7 +732,7 @@ function vAlimentos(){
   const q = S.fq.trim().toLowerCase();
   const keep = (it) => (!S.fmenu || it.m) && (!q || (it.n + ' ' + (it.note || '')).toLowerCase().includes(q));
   const cnt = (t) => t.groups.reduce((a, g) => a + g.items.filter(keep).length, 0);
-  let h = backTo('mas', 'Alimentos para Natalia')
+  let h = backTo('inicio', 'Alimentos para Natalia')
     + '<p class="muted" style="font-size:13.5px;margin:0 0 12px">Su guía para el colon irritable y el SIBO, según la dieta baja en FODMAP.</p>'
     + '<div class="ftiles" role="tablist">' + DATA.foods.map((t) => '<button class="ftile ft-' + t.tone + (!q && S.ft === t.tone ? ' on' : '') + '" role="tab" aria-selected="' + (!q && S.ft === t.tone) + '" data-ft="' + t.tone + '"><span class="ftic" aria-hidden="true">' + ic[t.tone] + '</span><b>' + cnt(t) + '</b><span>' + short[t.tone] + '</span></button>').join('') + '</div>'
     + '<div class="frow"><label class="card search fsearch" for="fq">' + IC.search + '<input id="fq" type="search" placeholder="Buscar alimento" value="' + esc(S.fq) + '" autocomplete="off"></label>'
@@ -765,7 +823,7 @@ function render(){
   $('#app').innerHTML = (V[v] || vMas)();
   Object.keys(vals).forEach((id) => { const el = document.getElementById(id); if (el && id !== 'q') el.value = vals[id]; });
   if (keep && keep !== 'q') { const el = document.getElementById(keep); if (el) el.focus(); }
-  const tab = v === 'inicio' || v === 'menu' ? 'inicio' : v === 'receta' ? (S.prev === 'recetas' ? 'recetas' : 'inicio') : ['notas','alimentos','hogar','restaurantes','batch'].includes(v) ? 'mas' : v;
+  const tab = v === 'alimentos' ? 'inicio' : v === 'inicio' || v === 'menu' ? 'inicio' : v === 'receta' ? (S.prev === 'recetas' ? 'recetas' : 'inicio') : ['notas','alimentos','hogar','restaurantes','batch'].includes(v) ? 'mas' : v;
   $('#tabs').innerHTML = [['inicio', IC.menu, 'Menú'], ['recetas', IC.grid, 'Alternativas'], ['lista', IC.cart, 'Lista'], ['mas', IC.more, 'Más']]
     .map((t) => '<button class="tab' + (tab === t[0] ? ' on' : '') + '" data-go="' + t[0] + '"' + (tab === t[0] ? ' aria-current="page"' : '') + '><span class="ic">' + t[1] + '</span>' + t[2] + '</button>').join('');
   const q = $('#q'); if (q && S._focusQ) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
