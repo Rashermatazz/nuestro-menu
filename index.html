@@ -715,11 +715,13 @@ const BATCH = {
       ['both', 'Arroz: 100 g en seco (la mitad) al táper del lunes y el resto al congelador para el martes. Uno friega y el otro reparte en tápers con el día.', 'lun · mar']],
     tips: ['Los garbanzos del jueves, al congelador; el estofado del miércoles aguanta en la nevera.', 'El arroz del martes, saca del congelador la noche antes.', 'El salmón y el boniato del lunes, y el arroz con gambas del viernes, se hacen en el momento.']}
 };
+const BREC = {A: [['pollo-al-horno-con-arroz-integral-y-verduras', 'Lunes'], ['guiso-de-sepia-con-patatas', 'Martes'], ['lentejas-con-contramuslo-y-verduras', 'Miércoles y jueves (Mario)']], B: [['estofado-de-pollo-con-arroz', 'Lunes y miércoles'], ['pisto-con-atun-huevo-y-arroz-integral', 'Martes'], ['garbanzos-con-pollo-y-verduras', 'Jueves']]};
 function vBatch(){
   const cur = weekInfo().week; const nxt = cur === 'A' ? 'B' : 'A'; if (!S.bwk) S.bwk = nxt; const b = BATCH[S.bwk];
   let h = backTo('mas', 'Batch del domingo')
     + '<div class="seg" role="group" aria-label="Semana">' + ['A','B'].map((x) => '<button class="' + (S.bwk === x ? 'on' : '') + '" data-bwk="' + x + '">Para la semana ' + x + '</button>').join('') + '</div>'
     + '<div class="card" style="padding:12px 14px;margin-bottom:12px"><b>' + esc(b.t) + '</b><p class="muted" style="margin:4px 0 0;font-size:13px">' + esc(b.dishes) + '</p></div>'
+    + '<div class="sect" style="margin-top:4px">📖 Recetas de este batch</div><div class="card" style="padding:4px 14px;margin-bottom:12px">' + (BREC[S.bwk] || []).map(([id, d]) => { const r = recById(id); return r ? '<button class="rrow" data-rec="' + id + '"><span class="rrow-t"><b>' + esc(r.t) + '</b><small>' + esc(d) + '</small></span><span class="chev" aria-hidden="true">›</span></button>' : ''; }).join('') + '</div>'
     + '<div class="sect" style="margin-top:4px">🔁 Lo que se repite esta semana</div><div class="card" style="padding:4px 14px;margin-bottom:12px">' + b.rep.map((x) => '<div class="brep"><span class="brep-i">' + x[0] + '</span><span><b>' + esc(x[1]) + '</b><small>' + esc(x[2]) + '</small></span></div>').join('') + '</div>'
     + '<div class="sect">👣 Paso a paso</div><p class="muted" style="font-size:12.5px;margin:0 0 10px">Cada uno sigue sus pasos en orden. A la derecha, para qué días es. Cantidades y detalle, en cada receta del menú.</p>'
     + '<ol class="card bsteps">' + b.steps.map((x) => '<li><span class="whochip w-' + x[0] + '">' + esc(WHO[x[0]]) + '</span><span style="flex:1">' + esc(x[1]) + '</span>' + (x[2] ? '<span class="bday">' + esc(x[2]) + '</span>' : '') + '</li>').join('') + '</ol>'
