@@ -662,7 +662,7 @@ function vInicio(){
     ['diario', '📓', 'Diario de Natalia', 'Cómo le sienta cada comida', 'mer']];
   return '<div class="hero"><span class="logo">' + IC.menu.replace('stroke-width="2"', 'stroke-width="2" stroke="currentColor"') + '</span><h1>Nuestro Menú</h1><span class="muted">' + esc(fmtDate(new Date())) + '</span><button class="wk" data-week="' + other + '" style="margin-top:8px;font-weight:400"><b>Semana ' + wk + '</b> <span class="muted">· Cambiar a ' + other + '</span></button></div>'
     + '<div class="hgrid">' + T.map((t, k) => '<button class="htile t-' + t[4] + (k === T.length - 1 && T.length % 2 ? ' full' : '') + '" data-go="' + t[0] + '"><span class="he">' + t[1] + '</span><b>' + esc(t[2]) + '</b><small>' + esc(t[3]) + '</small></button>').join('') + '</div>'
-    + '<p class="muted" style="text-align:center;font-size:11.5px;margin:18px 0 0">Versión 53 · 25 oct 2026</p>';
+    + '<p class="muted" style="text-align:center;font-size:11.5px;margin:18px 0 0">Versión 55 · 26 oct 2026</p>';
 }
 function navCard(view, icon, t, sub, hi){
   return '<button class="card nav-card' + (hi === true ? ' hi' : hi ? ' ' + hi : '') + '" data-go="' + view + '">' + icon + '<span class="t"><b>' + esc(t) + '</b><span>' + esc(sub) + '</span></span><span aria-hidden="true">›</span></button>';
@@ -780,7 +780,7 @@ function kTxt(x){ const k = x.m.k; if (!k || x.free || x.sw) return ''; return '
 function mealRow(wk, x){
   const done = !!(S.mdone[mdKey(wk)] || {})[x.key];
   const lab = esc(x.m.t) + (x.o ? ' · ' + esc(x.o.t) : '');
-  return '<div class="mrw' + (done ? ' done' : '') + '"><button class="mrw-c t-' + TINT[x.m.t] + '" data-mdone="' + x.key + '" aria-pressed="' + done + '" aria-label="Marcar ' + esc(x.m.t.toLowerCase()) + ' como hecha">' + (done ? IC.check : MEMO[x.m.t]) + '</button>'
+  return '<div class="mrw"><span class="mrw-c t-' + TINT[x.m.t] + '" aria-hidden="true">' + MEMO[x.m.t] + '</span>'
     + '<div class="mrw-b"><small>' + lab + (kTxt(x) ? '<span class="kk">' + kTxt(x) + '</span>' : '') + '</small>' + x.lines.map((l) => lineBtn(x, l, 'mrw-n')).join('') + pstLine(x) + mealActs(wk, x) + merList(x) + '</div></div>';
 }
 function heroCard(wk, x, isNow){
@@ -798,7 +798,6 @@ function heroCard(wk, x, isNow){
   if (m.t === 'Merienda') acts.push('<button class="btn" data-meropen="' + x.key + '">' + (S.merOpen === x.key ? 'Ocultar' : 'Ver opciones') + '</button>');
   else if (one && one.r) acts.push('<button class="btn" data-rec="' + one.r + '"' + (one.sw ? ' data-ctx="' + x.key + '"' : '') + '>📖 Receta</button>');
   if (!x.free && !x.sw && m.t !== 'Merienda' && subsFor(m).length) acts.push('<button class="btn" data-cambiar="' + x.key + '">⇄ Cambiar</button>');
-  acts.push('<button class="btn dark" data-mdone="' + x.key + '">' + IC.check + ' Hecho</button>');
   if (kTxt(x)) h += '<div class="now-k">🔥 ' + kTxt(x) + ' (estimadas)</div>';
   h += '<div class="now-a">' + acts.join('') + '</div>' + merList(x) + '</section>';
   return h;
@@ -827,13 +826,13 @@ function vDia(){
   if (di === 1) h += '<p class="dnote2">Mario: la comida del táper es tu cena (martes en casa de tus padres).</p>';
   const infos = day.m.map((_, mi) => mealInfo(wk, di, mi));
   if (isToday) {
-    const c = clockMeal(); let hero = -1;
-    for (let i = c; i < infos.length; i++) if (!done[infos[i].key]) { hero = i; break; }
-    const before = infos.filter((x, i) => hero < 0 || i < hero);
-    if (before.length) h += '<div class="dchips">' + before.map((x) => { const on = !!done[x.key]; return '<button class="dchip' + (on ? ' on' : '') + '" data-mdone="' + x.key + '" aria-pressed="' + on + '">' + (on ? IC.check + ' ' + esc(x.m.t) + ' hecho' : MEMO[x.m.t] + ' ' + esc(x.m.t) + ' · ¿hecho?') + '</button>'; }).join('') + '</div>';
-    if (hero >= 0) h += heroCard(wk, infos[hero], hero === c);
-    else if (infos.every((x) => done[x.key])) h += '<div class="card alldone">✓ Hoy ya está todo hecho</div>';
-    const after = hero >= 0 ? infos.slice(hero + 1) : [];
+    const hero = clockMeal();
+    const before = infos.slice(0, hero);
+    if (before.length) h += '<div class="dchips">' + before.map((x) => '<button class="dchip' + (S.pastOpen === x.key ? ' on' : '') + '" data-pastopen="' + x.key + '" aria-expanded="' + (S.pastOpen === x.key) + '">' + MEMO[x.m.t] + ' ' + esc(x.m.t) + ' ' + (S.pastOpen === x.key ? '▴' : '▾') + '</button>').join('') + '</div>';
+    const op = before.find((x) => x.key === S.pastOpen);
+    if (op) h += '<div class="card mlist">' + mealRow(wk, op) + '</div>';
+    h += heroCard(wk, infos[hero], true);
+    const after = infos.slice(hero + 1);
     if (after.length) h += '<div class="sec2">Luego</div><div class="card mlist">' + after.map((x) => mealRow(wk, x)).join('') + '</div>';
   } else h += '<div class="card mlist">' + infos.map((x) => mealRow(wk, x)).join('') + '</div>';
   const note = PREP[wk] && PREP[wk][di];
@@ -934,13 +933,13 @@ function ctxSub(){
 }
 /* ---------- platos que se cocinan juntos (misma sartén) ---------- */
 const JUNTO = new Set(['guiso-de-sepia-con-patatas','lentejas-con-contramuslo-y-verduras','wok-de-cerdo-con-arroz-integral-brocoli-y-verduras','estofado-de-pollo-con-arroz','estofado-de-pollo-con-patata','pisto-con-atun-huevo-y-arroz-integral','garbanzos-con-pollo-y-verduras','arroz-salteado-con-gambas-y-verduras','pasta-con-salmon-calabacin-y-tomate','pollo-a-la-sarten-con-verduras-salteadas','alt-macarrones-bocata','alt-gambas-arroz','alt-garbanzos-calamar','alt-huevos-pisto','alt-albondigas-pollo']);
-const APARTE = /arroz|pasta|huevo|mandarina|pan |pan$|plátano|kiwi/i;
+const APARTE = /arroz|pasta|huevo|mandarina|pan |pan$|plátano|kiwi|atún|lata/i;
 function qParse(q){ const m = String(q || '').match(/^([\d.,]+)\s*(g|ml|u)?/); return m ? {v: parseFloat(m[1].replace(',', '.')), u: m[2] || ''} : null; }
 function ingJunto(ing){
   const pot = [], apart = []; let sM = 0, sN = 0; const more = {M: [], N: []};
   ing.forEach((i) => {
     const a = qParse(i[1]), b = qParse(i[2]);
-    if (APARTE.test(i[0]) || !a || !b || a.u === 'u') { apart.push(i); return; }
+    if (APARTE.test(i[0]) || !a || !b || a.u === 'u' || !/^[\d.,]+\s*(g|ml)\b/.test(String(i[1]))) { apart.push(i); return; }
     const tot = a.v + b.v; pot.push([i[0], Math.round(tot) + ' ' + (a.u || 'g')]);
     sM += a.v; sN += b.v;
     const nm = i[0].replace(/\s*\(.*\)/, '');
@@ -1319,6 +1318,7 @@ document.addEventListener('click', async (e) => {
   if (d.bsheet !== undefined) { S.bsheet = +d.bsheet; return render(); }
   if ('bsheetx' in d) { S.bsheet = null; return render(); }
   if (d.bck !== undefined) return toggleB(d.bck);
+  if (d.pastopen) { S.pastOpen = S.pastOpen === d.pastopen ? null : d.pastopen; return render(); }
   if (d.mdone) return toggleMealDone(d.mdone);
   if (d.timer) { const [mn, ...lb] = d.timer.split('|'); return startTimer(lb.join('|'), +mn); }
   if (d.tcancel) { const k = TIMERS.findIndex((t) => String(t.id) === d.tcancel); if (k >= 0) TIMERS.splice(k, 1); return drawTimers(); }
